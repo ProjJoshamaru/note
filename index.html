@@ -18,22 +18,62 @@
     <script>
       let notes = {}
 
-      function saveNote() {
-        const noteText = document.getElementById("note-text").value;
-        const code = generateCode();
-        notes[code] = noteText;
-        saveNotesToLocalStorage();
+     <script>
+  function saveNote() {
+    const noteText = document.getElementById("note-text").value;
+    fetch('http://localhost:3000/notes', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ note: noteText })
+    })
+      .then(response => response.json())
+      .then(data => {
+        alert("Note saved with code: " + data.code);
         displayNotes();
-      }
+      })
+      .catch(error => console.error(error));
+  }
 
-      function displayNotes() {
-        const notesDiv = document.getElementById("notes");
+  function displayNotes() {
+    const notesDiv = document.getElementById("notes");
+    notesDiv.innerHTML = "Loading...";
+    fetch('http://localhost:3000/notes')
+      .then(response => response.json())
+      .then(data => {
         notesDiv.innerHTML = "";
-        for (const code in notes) {
-          const noteText = notes[code];
+        for (const code in data.notes) {
+          const noteText = data.notes[code];
           notesDiv.innerHTML += `<div>Code: ${code} - Note: ${noteText}</div>`;
         }
-      }
+      })
+      .catch(error => console.error(error));
+  }
+
+  function loadNote() {
+    const code = prompt("Enter code:");
+    fetch(`http://localhost:3000/notes/${code}`)
+      .then(response => {
+        if (response.ok) {
+          return response.json();
+        } else {
+          throw new Error('Note not found');
+        }
+      })
+      .then(data => {
+        document.getElementById("note-text").value = data.note;
+})
+.catch(error => {
+console.error(error);
+alert("Note not found");
+});
+}
+
+function clearNotes() {
+notes = {};
+displayNotes();
+
 
       function loadNote(code) {
         const noteText = notes[code];
