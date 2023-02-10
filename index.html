@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Notes</title>
+    <title>Note Taking Website</title>
   </head>
   <body onload="loadNotesFromLocalStorage()">
-    <h1>Note's</h1>
+    <h1>Note Taking Website</h1>
     <form id="note-form">
       <textarea id="note-text" rows="10" cols="30"></textarea><br>
       <button type="button" onclick="saveNote()">Save Note</button>
@@ -13,6 +13,8 @@
       <input type="text" id="note-code"><br>
       <button type="button" onclick="loadNote(document.getElementById('note-code').value)">Load Note</button>
     </form>
+    <h2>Your Notes:</h2>
+    <div id="notes"></div>
     <script>
       let notes = {}
 
@@ -21,6 +23,16 @@
         const code = generateCode();
         notes[code] = noteText;
         saveNotesToLocalStorage();
+        displayNotes();
+      }
+
+      function displayNotes() {
+        const notesDiv = document.getElementById("notes");
+        notesDiv.innerHTML = "";
+        for (const code in notes) {
+          const noteText = notes[code];
+          notesDiv.innerHTML += `<div>Code: ${code} - Note: ${noteText}</div>`;
+        }
       }
 
       function loadNote(code) {
@@ -50,6 +62,7 @@
         if (storedNotes) {
           notes = JSON.parse(storedNotes);
         }
+        displayNotes();
       }
     </script>
   </body>
